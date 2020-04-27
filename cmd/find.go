@@ -24,7 +24,7 @@ import (
 // findCmd represents the find command
 var findCmd = &cobra.Command{
 	Use:   "find",
-	Short: "A brief description of your command",
+	Short: "Finds SQL objects by text",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
