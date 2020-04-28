@@ -16,14 +16,17 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"errors"
+	"os"
+
+	"github.com/sergio/sqlcli/sqlcmd"
 
 	"github.com/spf13/cobra"
 )
 
 // queryCmd represents the query command
 var queryCmd = &cobra.Command{
-	Use:   "query",
+	Use:   "query <sql-statement>",
 	Short: "Runs a SQL statement",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -31,8 +34,17 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("query called with args %#v", args)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("The <sql-statement> argument is required")
+		}
+		args = append([]string{"-Q"}, args...)
+		result, err := sqlcmd.RunWithArgs(args)
+		if err != nil {
+			return err
+		}
+		os.Stdout.Write(result)
+		return nil
 	},
 }
 
