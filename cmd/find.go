@@ -16,14 +16,17 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"errors"
+	"os"
 
+	"github.com/sergio/sqlcli/sqlcmd"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // findCmd represents the find command
 var findCmd = &cobra.Command{
-	Use:   "find",
+	Use:   "find <search-term>",
 	Short: "Finds SQL objects by text",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -31,21 +34,30 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("find called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("The <search-term> argument is required")
+		}
+
+		var config sqlcmd.Config
+		viper.Unmarshal(&config)
+
+		c := &sqlcmd.SearchCommand{
+			Config:     config,
+			SearchTerm: args[0],
+		}
+
+		result, err := sqlcmd.Run(c)
+		if err != nil {
+			return err
+		}
+
+		os.Stdout.Write(result)
+
+		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(findCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// findCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// findCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

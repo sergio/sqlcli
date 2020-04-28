@@ -22,6 +22,7 @@ import (
 	"github.com/sergio/sqlcli/sqlcmd"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // queryCmd represents the query command
@@ -35,29 +36,30 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+
 		if len(args) < 1 {
 			return errors.New("The <sql-statement> argument is required")
 		}
-		args = append([]string{"-Q"}, args...)
-		result, err := sqlcmd.RunWithArgs(args)
+
+		var config sqlcmd.Config
+		viper.Unmarshal(&config)
+
+		c := &sqlcmd.QueryCommand{
+			Config:       config,
+			SQLStatement: args[0],
+		}
+
+		result, err := sqlcmd.Run(c)
 		if err != nil {
 			return err
 		}
+
 		os.Stdout.Write(result)
+
 		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(queryCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// queryCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// queryCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

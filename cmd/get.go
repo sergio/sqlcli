@@ -16,14 +16,18 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"errors"
+	"os"
+	"strings"
 
+	"github.com/sergio/sqlcli/sqlcmd"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get",
+	Use:   "get <schema-qualified-name>",
 	Short: "Outputs an object's SQL definition.",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -31,21 +35,36 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("get called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("The <schema-qualified-name> argument is required")
+		}
+
+		words := strings.SplitN(args[0], ".", 2)
+		if len(words) < 2 {
+			return errors.New("The <schema-qualified-name> argument should be of the form <schema>.<name>")
+		}
+
+		var config sqlcmd.Config
+		viper.Unmarshal(&config)
+
+		c := &sqlcmd.GetObjectCommand{
+			Config:       config,
+			ObjectSchema: words[0],
+			ObjectName:   words[1],
+		}
+
+		result, err := sqlcmd.Run(c)
+		if err != nil {
+			return err
+		}
+
+		os.Stdout.Write(result)
+
+		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// getCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
