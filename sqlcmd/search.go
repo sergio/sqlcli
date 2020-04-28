@@ -18,8 +18,7 @@ func (c *SearchCommand) GetArgs() (map[string]string, error) {
 	
 	-- Table names
 	SELECT
-		   TABLE_SCHEMA  AS 'Object Schema'
-		  ,TABLE_NAME    AS 'Object Name'
+		   TABLE_SCHEMA + '.' + TABLE_NAME  AS 'Object Name'
 		  ,TABLE_TYPE    AS 'Object Type'
 		  ,'Table Name'  AS 'TEXT Location'
 	FROM  INFORMATION_SCHEMA.TABLES
@@ -27,8 +26,7 @@ func (c *SearchCommand) GetArgs() (map[string]string, error) {
 	UNION
 	 --Column names
 	SELECT
-		  TABLE_SCHEMA   AS 'Object Schema'
-		  ,COLUMN_NAME   AS 'Object Name'
+		  TABLE_SCHEMA + '.' + TABLE_NAME + '.' + COLUMN_NAME  AS 'Object Name'
 		  ,'COLUMN'      AS 'Object Type'
 		  ,'Column Name' AS 'TEXT Location'
 	FROM  INFORMATION_SCHEMA.COLUMNS
@@ -36,8 +34,7 @@ func (c *SearchCommand) GetArgs() (map[string]string, error) {
 	UNION
 	-- Function or procedure bodies
 	SELECT
-		  SPECIFIC_SCHEMA     AS 'Object Schema'
-		  ,ROUTINE_NAME       AS 'Object Name'
+		  SPECIFIC_SCHEMA + '.' + ROUTINE_NAME     AS 'Object Name'
 		  ,ROUTINE_TYPE       AS 'Object Type'
 {{if .Verbose}}
 		  ,ROUTINE_DEFINITION AS 'TEXT Location'
