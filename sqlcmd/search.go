@@ -4,6 +4,7 @@ package sqlcmd
 type SearchCommand struct {
 	Config
 	SearchTerm string
+	Verbose    bool
 }
 
 // GetArgs is a func
@@ -38,7 +39,11 @@ func (c *SearchCommand) GetArgs() (map[string]string, error) {
 		  SPECIFIC_SCHEMA     AS 'Object Schema'
 		  ,ROUTINE_NAME       AS 'Object Name'
 		  ,ROUTINE_TYPE       AS 'Object Type'
+{{if .Verbose}}
 		  ,ROUTINE_DEFINITION AS 'TEXT Location'
+{{else}}
+		,'ROUTINE_DEFINITION' AS 'TEXT Location'
+{{end}}
 	FROM  INFORMATION_SCHEMA.ROUTINES 
 	WHERE ROUTINE_DEFINITION LIKE '%'+@Text+'%'
 		  AND (ROUTINE_TYPE = 'function' OR ROUTINE_TYPE = 'procedure');`

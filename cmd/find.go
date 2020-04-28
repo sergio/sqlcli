@@ -45,6 +45,7 @@ to quickly create a Cobra application.`,
 		c := &sqlcmd.SearchCommand{
 			Config:     config,
 			SearchTerm: args[0],
+			Verbose:    verbose,
 		}
 
 		result, err := sqlcmd.Run(c)

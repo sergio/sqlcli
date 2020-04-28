@@ -1,3 +1,4 @@
+SqlCmdBinary: /usr/local/bin/sqlcmd
 Server: local
 Database: mydb
 Username: username

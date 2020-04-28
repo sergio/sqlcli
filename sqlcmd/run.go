@@ -3,9 +3,9 @@ package sqlcmd
 import (
 	"fmt"
 	"os/exec"
-)
 
-const executablePath = "/Users/sergio/bin/sqlcmd-fake"
+	"github.com/spf13/viper"
+)
 
 // Run runs sqlcmd executable with the provided arguments
 func Run(command ArgsGetter) ([]byte, error) {
@@ -19,17 +19,19 @@ func Run(command ArgsGetter) ([]byte, error) {
 		commandLine = append(
 			commandLine,
 			fmt.Sprintf(`-%s`, k),
-			fmt.Sprintf(`"%s"`, v))
+			fmt.Sprintf(`%s`, v))
 	}
 
-	return runExternalCommand(commandLine)
+	sqlCmdBinary := viper.GetString("SqlCmdBinary")
+	return runExternalCommand(sqlCmdBinary, commandLine)
 }
 
-func runExternalCommand(args []string) ([]byte, error) {
+func runExternalCommand(executablePath string, args []string) ([]byte, error) {
 	cmd := exec.Command(executablePath, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("%v: %s", err, output)
+		commandLine := fmt.Sprintf("%s %#v", executablePath, args)
+		return nil, fmt.Errorf("%v: %s\nCommand line: [%s]", err, output, commandLine)
 	}
 	return output, nil
 }
