@@ -4,5 +4,4 @@ build:
 
 .PHONY: install
 install: build
-	cp sqlcli ~/bin/sqlcli
-
+	cp sqlcli /usr/local/bin/sqlcli
