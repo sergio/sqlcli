@@ -13,5 +13,7 @@ func (c *QueryCommand) GetArgs() (map[string]string, error) {
 		return nil, err
 	}
 	args["Q"] = c.SQLStatement
+	args["Y"] = "80"
+	args["y"] = "80"
 	return args, nil
 }

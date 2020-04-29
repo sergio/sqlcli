@@ -49,5 +49,8 @@ func (c *SearchCommand) GetArgs() (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	args["Y"] = "100" // max column width in chars
+
 	return args, nil
 }
